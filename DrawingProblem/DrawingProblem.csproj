@@ -43,13 +43,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Drawing.cs" />
     <Compile Include="DrawingActions\CreateCanvas.cs" />
     <Compile Include="DrawingActions\CreateNewLine.cs" />
     <Compile Include="DrawingActions\CreateRectangle.cs" />
     <Compile Include="DrawingActions\FillArea.cs" />
     <Compile Include="DrawingFactory\DrawingFactory.cs" />
-    <Compile Include="IDrawing.cs" />
+    <Compile Include="DrawingActions\IDrawing.cs" />
     <Compile Include="DrawingFactory\IDrawingFactory.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
