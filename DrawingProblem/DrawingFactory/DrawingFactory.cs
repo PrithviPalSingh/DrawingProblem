@@ -1,18 +1,15 @@
 ﻿using DrawingProblem.DrawingActions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DrawingProblem.DrawingFactory
 {
+    /// <summary>
+    /// Factory class that will return object of intened drawing class as per command send accross
+    /// </summary>
     class DrawingFactory : IDrawingFactory
     {
         public IDrawing CreateObject(string c)
         {
             IDrawing drawing = null;
-
             switch (c)
             {
                 case "C":

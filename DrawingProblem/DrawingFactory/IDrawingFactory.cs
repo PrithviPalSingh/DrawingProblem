@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DrawingProblem
+﻿namespace DrawingProblem
 {
+    /// <summary>
+    /// Inteface for object factory class
+    /// </summary>
     interface IDrawingFactory
     {
         IDrawing CreateObject(string c);

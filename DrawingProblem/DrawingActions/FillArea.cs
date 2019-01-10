@@ -1,62 +1,34 @@
-﻿using System;
+﻿using DrawingProblem.Models;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DrawingProblem.DrawingActions
 {
+    /// <summary>
+    /// Will implement Draw() method of IDrawing interface to fill area with specified character
+    /// </summary>
     class FillArea : IDrawing
     {
-        //public void Draw(char[][] matrix, bool[][] checkMatrix, int x1, int y1, char c)
-        //public void Draw(char[][] matrix, params object[] param)
-        //{
-        //    bool[][] checkMatrix = (bool[][])param[0];
-        //    int x1 = (int)param[1];
-        //    int y1 = (int)param[2];
-        //    char c = (char)param[3];
-
-        //    if (x1 < 1 || y1 < 1 || matrix[y1][x1] == 'x' || matrix[y1][x1] == '-' || matrix[y1][x1] == '|')
-        //        return;
-
-        //    matrix[y1][x1] = c;
-        //    checkMatrix[y1][x1] = true;
-
-        //    if (x1 > 0 && !checkMatrix[y1][x1 - 1])
-        //        Draw(matrix, checkMatrix, x1 - 1, y1, c);
-
-        //    if (x1 < matrix[y1].Length - 1 && !checkMatrix[y1][x1 + 1])
-        //        Draw(matrix, checkMatrix, x1 + 1, y1, c);
-
-        //    if (y1 > 0 && !checkMatrix[y1 - 1][x1])
-        //        Draw(matrix, checkMatrix, x1, y1 - 1, c);
-
-        //    if (y1 < matrix.Length - 1 && !checkMatrix[y1 + 1][x1])
-        //        Draw(matrix, checkMatrix, x1, y1 + 1, c);
-        //}
-
-        public void Draw(char[][] matrix, bool[][] checkMatrix = null, char c = ' ', params int[] param)
+        public void Draw(char[][] matrix, List<Point> list, char c = ' ')
         {
-            int x1 = param[0];
-            int y1 = param[1];
+            int x = list[0].X;
+            int y = list[0].Y;
 
-            if (x1 < 1 || y1 < 1 || matrix[y1][x1] == 'x' || matrix[y1][x1] == '-' || matrix[y1][x1] == '|')
+            if (x < 1 || y < 1 || matrix[y][x] == 'x' || matrix[y][x] == '-' || matrix[y][x] == '|')
                 return;
 
-            matrix[y1][x1] = c;
-            checkMatrix[y1][x1] = true;
+            matrix[y][x] = c;
 
-            if (x1 > 0 && !checkMatrix[y1][x1 - 1])
-                Draw(matrix, checkMatrix, c, x1 - 1, y1);
+            if (x > 0 && matrix[y][x - 1] == '\0')
+                Draw(matrix, new List<Point>() { new Point { X = x - 1, Y = y } }, c);
 
-            if (x1 < matrix[y1].Length - 1 && !checkMatrix[y1][x1 + 1])
-                Draw(matrix, checkMatrix, c, x1 + 1, y1);
+            if (x < matrix[y].Length - 1 && matrix[y][x + 1] == '\0')
+                Draw(matrix, new List<Point>() { new Point { X = x + 1, Y = y } }, c);
 
-            if (y1 > 0 && !checkMatrix[y1 - 1][x1])
-                Draw(matrix, checkMatrix, c, x1, y1 - 1);
+            if (y > 0 && matrix[y - 1][x] == '\0')
+                Draw(matrix, new List<Point>() { new Point { X = x, Y = y - 1 } }, c);
 
-            if (y1 < matrix.Length - 1 && !checkMatrix[y1 + 1][x1])
-                Draw(matrix, checkMatrix, c, x1, y1 + 1);
+            if (y < matrix.Length - 1 && matrix[y + 1][x] == '\0')
+                Draw(matrix, new List<Point>() { new Point { X = x, Y = y + 1 } }, c);
         }
     }
 }
