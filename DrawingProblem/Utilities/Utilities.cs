@@ -22,7 +22,7 @@ namespace DrawingProblem.Utilities
                 }
 
                 Console.WriteLine();
-            }
+            }           
         }
 
         /// <summary>
@@ -33,8 +33,8 @@ namespace DrawingProblem.Utilities
         /// </summary>
         public static bool ValidCoordinates(List<Point> pointList, int w, int h)
         {
-            if (w == -1 || h == -1 || pointList.Count == 0)
-                return false;
+            //if (w == -1 || h == -1 || pointList.Count == 0)
+            //    return false;
 
             foreach (var item in pointList)
             {
