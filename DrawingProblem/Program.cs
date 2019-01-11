@@ -18,15 +18,9 @@ namespace DrawingProblem
 
                 bool IssueCommand = true;
                 while (IssueCommand)
-                {                    
+                {
                     Console.Write(Constants.EnterCommandMessage);
                     string[] command = Console.ReadLine().Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
-
-                    if (command.Length == 0)
-                    {
-                        Console.WriteLine(Constants.NoCommandMessage);
-                        continue;
-                    }
 
                     List<Point> list = new List<Point>();
                     bool hasError = false;
@@ -44,7 +38,7 @@ namespace DrawingProblem
 
                     Console.WriteLine();
                 }
-                
+
             }
             catch (Exception ex)
             {
@@ -74,95 +68,162 @@ namespace DrawingProblem
             ref int width, ref int height, ref char c, ref bool hasError)
         {
             bool issueCommand = true;
-            switch (command[0].ToUpper())
+            int x1 = -1, y1 = -1, x2 = -1, y2 = -1;
+            if (command.Length == 0)
             {
-                case "C":
-                    if (command.Length != 3)
-                    {
-                        hasError = true;
-                        Console.WriteLine(Constants.ImproperCreateCommandMessage);
+                hasError = true;
+                Console.WriteLine(Constants.NoCommandMessage);
+            }
+            else
+            {
+                switch (command[0].ToUpper())
+                {
+                    case "C":
+                        if (command.Length != 3)
+                        {
+                            hasError = true;
+                            Console.WriteLine(Constants.ImproperCreateCommandMessage);
+                            break;
+                        }
+
+                        if (!int.TryParse(command[1], out width) || !int.TryParse(command[2], out height))
+                        {
+                            hasError = true;
+                            Console.WriteLine(Constants.InvalidArgumentFormat);
+                            break;
+                        }
+
+                        if (width <= 0 || height <= 0)
+                        {
+                            hasError = true;
+                            Console.WriteLine(Constants.CannotCreateCanvasMessage);
+                            break;
+                        }
+
+                        list.Add(new Point { X = width, Y = height });
+                        matrix = new char[height + 2][];
                         break;
-                    }
+                    case "L":
+                        if (matrix == null)
+                        {
+                            hasError = true;
+                            Console.WriteLine(Constants.CanvasNotPresentMessage);
+                            break;
+                        }
 
-                    width = Convert.ToInt32(command[1]);
-                    height = Convert.ToInt32(command[2]);
+                        if (command.Length != 5)
+                        {
+                            hasError = true;
+                            Console.WriteLine(Constants.ImproperNewLineCommandMessage);
+                            break;
+                        }
 
-                    if (width <= 0 || height <= 0) {
-                        hasError = true;
-                        Console.WriteLine(Constants.CannotCreateCanvasMessage);
+                        if (!int.TryParse(command[1], out x1) || !int.TryParse(command[2], out y1)
+                            || !int.TryParse(command[3], out x2) || !int.TryParse(command[4], out y2))
+                        {
+                            hasError = true;
+                            Console.WriteLine(Constants.InvalidArgumentFormat);
+                            break;
+                        }
+
+                        if ((x1 != x2) && (y1 != y2))
+                        {
+                            hasError = true;
+                            Console.WriteLine(Constants.NotALineMessage);
+                            break;
+                        }
+
+                        if (x1 < x2)
+                        {
+                            list.Add(new Point { X = x1, Y = y1 });
+                            list.Add(new Point { X = x2, Y = y2 });
+                        }
+                        else
+                        {
+                            list.Add(new Point { X = x2, Y = y2 });
+                            list.Add(new Point { X = x1, Y = y1 });
+                        }
+
                         break;
-                    }
+                    case "R":
 
-                    list.Add(new Point { X = width, Y = height });
-                    matrix = new char[height + 2][];
-                    break;
-                case "L":
-                    if (matrix == null)
-                    {
-                        hasError = true;
-                        Console.WriteLine(Constants.CanvasNotPresentMessage);
+                        if (matrix == null)
+                        {
+                            hasError = true;
+                            Console.WriteLine(Constants.CanvasNotPresentMessage);
+                            break;
+                        }
+
+                        if (command.Length != 5)
+                        {
+                            hasError = true;
+                            Console.WriteLine(Constants.ImproperRectangleCommandMessage);
+                            break;
+                        }
+
+                        if (!int.TryParse(command[1], out x1) || !int.TryParse(command[2], out y1)
+                            || !int.TryParse(command[3], out x2) || !int.TryParse(command[4], out y2))
+                        {
+                            hasError = true;
+                            Console.WriteLine(Constants.InvalidArgumentFormat);
+                            break;
+                        }
+
+                        if ((x1 == x2) || (y1 == y2))
+                        {
+                            hasError = true;
+                            Console.WriteLine(Constants.NotARectangleMessage);
+                            break;
+                        }
+
+                        if (x1 < x2)
+                        {
+                            list.Add(new Point { X = x1, Y = y1 });
+                            list.Add(new Point { X = x2, Y = y2 });
+                        }
+                        else
+                        {
+                            list.Add(new Point { X = x2, Y = y2 });
+                            list.Add(new Point { X = x1, Y = y1 });
+                        }
+
                         break;
-                    }
+                    case "B":
+                        if (matrix == null)
+                        {
+                            hasError = true;
+                            Console.WriteLine(Constants.CanvasNotPresentMessage);
+                            break;
+                        }
 
-                    if (command.Length != 5)
-                    {
-                        hasError = true;
-                        Console.WriteLine(Constants.ImproperNewLineCommandMessage);
+                        if (command.Length != 4)
+                        {
+                            hasError = true;
+                            Console.WriteLine(Constants.ImproperFillCommandMessage);
+                            break;
+                        }
+
+                        if (!int.TryParse(command[1], out x1) || !int.TryParse(command[2], out y1)
+                            || !char.TryParse(command[3], out c))
+                        {
+                            hasError = true;
+                            Console.WriteLine(Constants.InvalidArgumentFormat);
+                            break;
+                        }
+
+                        list.Add(new Point { X = x1, Y = y1 });
+
                         break;
-                    }
-
-                    list.Add(new Point { X = Convert.ToInt32(command[1]), Y = Convert.ToInt32(command[2]) });
-                    list.Add(new Point { X = Convert.ToInt32(command[3]), Y = Convert.ToInt32(command[4]) });
-
-                    break;
-                case "R":
-
-                    if (matrix == null)
-                    {
+                    case "Q":
                         hasError = true;
-                        Console.WriteLine(Constants.CanvasNotPresentMessage);
+                        issueCommand = false;
+                        Console.WriteLine(Constants.ExitMessage);
                         break;
-                    }
-
-                    if (command.Length != 5)
-                    {
+                    default:
                         hasError = true;
-                        Console.WriteLine(Constants.ImproperRectangleCommandMessage);
+                        Console.WriteLine(Constants.BadCommandMessage);
                         break;
-                    }
-
-                    list.Add(new Point { X = Convert.ToInt32(command[1]), Y = Convert.ToInt32(command[2]) });
-                    list.Add(new Point { X = Convert.ToInt32(command[3]), Y = Convert.ToInt32(command[4]) });
-
-                    break;
-                case "B":
-                    if (matrix == null)
-                    {
-                        hasError = true;
-                        Console.WriteLine(Constants.CanvasNotPresentMessage);
-                        break;
-                    }
-
-                    if (command.Length != 4)
-                    {
-                        hasError = true;
-                        Console.WriteLine(Constants.ImproperFillCommandMessage);
-                        break;
-                    }
-
-                    list.Add(new Point { X = Convert.ToInt32(command[1]), Y = Convert.ToInt32(command[2]) });
-                    c = Convert.ToChar(command[3]);
-
-                    break;
-                case "Q":
-                    hasError = true;
-                    issueCommand = false;
-                    Console.WriteLine(Constants.ExitMessage);
-                    break;
-                default:
-                    hasError = true;
-                    Console.WriteLine(Constants.BadCommandMessage);
-                    break;
+                }
             }
 
             if (!hasError && !Utilities.Utilities.ValidCoordinates(list, width, height))
