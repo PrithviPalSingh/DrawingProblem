@@ -2,6 +2,7 @@
 using DrawingProblem.Utilities;
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace DrawingProblem
 {
@@ -23,11 +24,7 @@ namespace DrawingProblem
                     string[] command = Console.ReadLine().Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
 
                     List<Point> list = new List<Point>();
-                    bool hasError = false;
-                    IssueCommand = ProcessCommand(command, list, ref matrix, ref width, ref height,
-                        ref c, ref hasError);
-
-                    if (!hasError)
+                    if (!ProcessCommand(command, list, ref matrix, ref width, ref height, ref c, ref IssueCommand))
                     {
                         IDrawingFactory df = new DrawingFactory.DrawingFactory();
                         IDrawing drawing = null;
@@ -44,6 +41,9 @@ namespace DrawingProblem
             {
                 Console.WriteLine(ex.Message);
                 Console.WriteLine(ex.StackTrace);
+                File.AppendAllText("ErrorMessages.txt", Environment.NewLine + DateTime.Now +
+                    Environment.NewLine + ex.Message + Environment.NewLine 
+                    + ex.StackTrace + Environment.NewLine);
                 Console.WriteLine(Constants.ExitMessage);
             }
             finally
@@ -65,13 +65,12 @@ namespace DrawingProblem
         /// <param name="action"></param>
         /// <param name="list"></param>
         private static bool ProcessCommand(string[] command, List<Point> list, ref char[][] matrix,
-            ref int width, ref int height, ref char c, ref bool hasError)
+            ref int width, ref int height, ref char c, ref bool issueCommand)
         {
-            bool issueCommand = true;
+            bool hasError = true;
             int x1 = -1, y1 = -1, x2 = -1, y2 = -1;
             if (command.Length == 0)
             {
-                hasError = true;
                 Console.WriteLine(Constants.NoCommandMessage);
             }
             else
@@ -81,39 +80,35 @@ namespace DrawingProblem
                     case "C":
                         if (command.Length != 3)
                         {
-                            hasError = true;
                             Console.WriteLine(Constants.ImproperCreateCommandMessage);
                             break;
                         }
 
                         if (!int.TryParse(command[1], out width) || !int.TryParse(command[2], out height))
                         {
-                            hasError = true;
                             Console.WriteLine(Constants.InvalidArgumentFormat);
                             break;
                         }
 
                         if (width <= 0 || height <= 0)
                         {
-                            hasError = true;
                             Console.WriteLine(Constants.CannotCreateCanvasMessage);
                             break;
                         }
 
+                        hasError = false;
                         list.Add(new Point { X = width, Y = height });
                         matrix = new char[height + 2][];
                         break;
                     case "L":
                         if (matrix == null)
                         {
-                            hasError = true;
                             Console.WriteLine(Constants.CanvasNotPresentMessage);
                             break;
                         }
 
                         if (command.Length != 5)
                         {
-                            hasError = true;
                             Console.WriteLine(Constants.ImproperNewLineCommandMessage);
                             break;
                         }
@@ -121,18 +116,17 @@ namespace DrawingProblem
                         if (!int.TryParse(command[1], out x1) || !int.TryParse(command[2], out y1)
                             || !int.TryParse(command[3], out x2) || !int.TryParse(command[4], out y2))
                         {
-                            hasError = true;
                             Console.WriteLine(Constants.InvalidArgumentFormat);
                             break;
                         }
 
                         if ((x1 != x2) && (y1 != y2))
                         {
-                            hasError = true;
                             Console.WriteLine(Constants.NotALineMessage);
                             break;
                         }
 
+                        hasError = false;
                         if (x1 < x2)
                         {
                             list.Add(new Point { X = x1, Y = y1 });
@@ -149,14 +143,12 @@ namespace DrawingProblem
 
                         if (matrix == null)
                         {
-                            hasError = true;
                             Console.WriteLine(Constants.CanvasNotPresentMessage);
                             break;
                         }
 
                         if (command.Length != 5)
                         {
-                            hasError = true;
                             Console.WriteLine(Constants.ImproperRectangleCommandMessage);
                             break;
                         }
@@ -164,18 +156,17 @@ namespace DrawingProblem
                         if (!int.TryParse(command[1], out x1) || !int.TryParse(command[2], out y1)
                             || !int.TryParse(command[3], out x2) || !int.TryParse(command[4], out y2))
                         {
-                            hasError = true;
                             Console.WriteLine(Constants.InvalidArgumentFormat);
                             break;
                         }
 
                         if ((x1 == x2) || (y1 == y2))
                         {
-                            hasError = true;
                             Console.WriteLine(Constants.NotARectangleMessage);
                             break;
                         }
 
+                        hasError = false;
                         if (x1 < x2)
                         {
                             list.Add(new Point { X = x1, Y = y1 });
@@ -191,14 +182,12 @@ namespace DrawingProblem
                     case "B":
                         if (matrix == null)
                         {
-                            hasError = true;
                             Console.WriteLine(Constants.CanvasNotPresentMessage);
                             break;
                         }
 
                         if (command.Length != 4)
                         {
-                            hasError = true;
                             Console.WriteLine(Constants.ImproperFillCommandMessage);
                             break;
                         }
@@ -206,21 +195,18 @@ namespace DrawingProblem
                         if (!int.TryParse(command[1], out x1) || !int.TryParse(command[2], out y1)
                             || !char.TryParse(command[3], out c))
                         {
-                            hasError = true;
                             Console.WriteLine(Constants.InvalidArgumentFormat);
                             break;
                         }
 
+                        hasError = false;
                         list.Add(new Point { X = x1, Y = y1 });
-
                         break;
                     case "Q":
-                        hasError = true;
                         issueCommand = false;
                         Console.WriteLine(Constants.ExitMessage);
                         break;
                     default:
-                        hasError = true;
                         Console.WriteLine(Constants.BadCommandMessage);
                         break;
                 }
@@ -232,7 +218,7 @@ namespace DrawingProblem
                 Console.WriteLine(Constants.CoordinatesOutsideCanvasMessage);
             }
 
-            return issueCommand;
+            return hasError;
         }
     }
 }
