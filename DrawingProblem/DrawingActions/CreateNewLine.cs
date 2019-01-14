@@ -8,7 +8,7 @@ namespace DrawingProblem.DrawingActions
     /// </summary>
     class CreateNewLine : IDrawing
     {
-        public void Draw(char[][] matrix, List<Point> list, char c = ' ')
+        public void Draw(char[][] matrix, IList<Point> list, char c = ' ')
         {
             int x1 = list[0].X;
             int y1 = list[0].Y;

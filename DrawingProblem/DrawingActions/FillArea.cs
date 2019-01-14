@@ -8,7 +8,7 @@ namespace DrawingProblem.DrawingActions
     /// </summary>
     class FillArea : IDrawing
     {
-        public void Draw(char[][] matrix, List<Point> list, char c = ' ')
+        public void Draw(char[][] matrix, IList<Point> list, char c = ' ')
         {
             int x = list[0].X;
             int y = list[0].Y;

@@ -3,6 +3,7 @@ using DrawingProblem.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 
 namespace DrawingProblem
 {
@@ -17,14 +18,13 @@ namespace DrawingProblem
                 char c = ' ';
                 char[][] matrix = null;
 
-                bool IssueCommand = true;
-                while (IssueCommand)
+                while (true)
                 {
                     Console.Write(Constants.EnterCommandMessage);
                     string[] command = Console.ReadLine().Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
 
                     List<Point> list = new List<Point>();
-                    if (!ProcessCommand(command, list, ref matrix, ref width, ref height, ref c, ref IssueCommand))
+                    if (!ProcessCommand(command, list, ref matrix, ref width, ref height, ref c))
                     {
                         IDrawingFactory df = new DrawingFactory.DrawingFactory();
                         IDrawing drawing = null;
@@ -42,9 +42,9 @@ namespace DrawingProblem
                 Console.WriteLine(ex.Message);
                 Console.WriteLine(ex.StackTrace);
                 File.AppendAllText("ErrorMessages.txt", Environment.NewLine + DateTime.Now +
-                    Environment.NewLine + ex.Message + Environment.NewLine 
+                    Environment.NewLine + ex.Message + Environment.NewLine
                     + ex.StackTrace + Environment.NewLine);
-                Console.WriteLine(Constants.ExitMessage);
+                Console.WriteLine(Constants.ExitMessageWhileException);
             }
             finally
             {
@@ -65,7 +65,7 @@ namespace DrawingProblem
         /// <param name="action"></param>
         /// <param name="list"></param>
         private static bool ProcessCommand(string[] command, List<Point> list, ref char[][] matrix,
-            ref int width, ref int height, ref char c, ref bool issueCommand)
+            ref int width, ref int height, ref char c)
         {
             bool hasError = true;
             int x1 = -1, y1 = -1, x2 = -1, y2 = -1;
@@ -75,140 +75,174 @@ namespace DrawingProblem
             }
             else
             {
-                switch (command[0].ToUpper())
+                if (!Enum.TryParse(command[0].ToUpper(), out CommandEnum parsedCommand))
                 {
-                    case "C":
-                        if (command.Length != 3)
-                        {
-                            Console.WriteLine(Constants.ImproperCreateCommandMessage);
-                            break;
-                        }
+                    Console.WriteLine(Constants.BadCommandMessage);
+                }
+                else
+                {
+                    switch (parsedCommand)
+                    {
+                        case CommandEnum.C:
+                            if (command.Length != 3)
+                            {
+                                Console.WriteLine(Constants.ImproperCreateCommandMessage);
+                                break;
+                            }
 
-                        if (!int.TryParse(command[1], out width) || !int.TryParse(command[2], out height))
-                        {
-                            Console.WriteLine(Constants.InvalidArgumentFormat);
-                            break;
-                        }
+                            if (!int.TryParse(command[1], out width) || !int.TryParse(command[2], out height))
+                            {
+                                Console.WriteLine(Constants.InvalidArgumentFormat);
+                                break;
+                            }
 
-                        if (width <= 0 || height <= 0)
-                        {
-                            Console.WriteLine(Constants.CannotCreateCanvasMessage);
-                            break;
-                        }
+                            if (width <= 0 || height <= 0)
+                            {
+                                Console.WriteLine(Constants.CannotCreateCanvasMessage);
+                                break;
+                            }
 
-                        hasError = false;
-                        list.Add(new Point { X = width, Y = height });
-                        matrix = new char[height + 2][];
-                        break;
-                    case "L":
-                        if (matrix == null)
-                        {
-                            Console.WriteLine(Constants.CanvasNotPresentMessage);
+                            hasError = false;
+                            list.Add(new Point { X = width, Y = height });
+                            matrix = new char[height + 2][];
                             break;
-                        }
+                        case CommandEnum.L:
+                            if (matrix == null)
+                            {
+                                Console.WriteLine(Constants.CanvasNotPresentMessage);
+                                break;
+                            }
 
-                        if (command.Length != 5)
-                        {
-                            Console.WriteLine(Constants.ImproperNewLineCommandMessage);
+                            if (command.Length != 5)
+                            {
+                                Console.WriteLine(Constants.ImproperNewLineCommandMessage);
+                                break;
+                            }
+
+                            if (!int.TryParse(command[1], out x1) || !int.TryParse(command[2], out y1)
+                                || !int.TryParse(command[3], out x2) || !int.TryParse(command[4], out y2))
+                            {
+                                Console.WriteLine(Constants.InvalidArgumentFormat);
+                                break;
+                            }
+
+                            if ((x1 != x2) && (y1 != y2))
+                            {
+                                Console.WriteLine(Constants.NotALineMessage);
+                                break;
+                            }
+
+                            hasError = false;
+                            if (x1 < x2)
+                            {
+                                list.Add(new Point { X = x1, Y = y1 });
+                                list.Add(new Point { X = x2, Y = y2 });
+                            }
+                            else if (x2 < x1)
+                            {
+                                list.Add(new Point { X = x2, Y = y2 });
+                                list.Add(new Point { X = x1, Y = y1 });
+                            }
+                            else
+                            {
+                                if (y1 < y2)
+                                {
+                                    list.Add(new Point { X = x1, Y = y1 });
+                                    list.Add(new Point { X = x2, Y = y2 });
+                                }
+                                else
+                                {
+                                    list.Add(new Point { X = x2, Y = y2 });
+                                    list.Add(new Point { X = x1, Y = y1 });
+                                }
+                            }
+
                             break;
-                        }
+                        case CommandEnum.R:
 
-                        if (!int.TryParse(command[1], out x1) || !int.TryParse(command[2], out y1)
-                            || !int.TryParse(command[3], out x2) || !int.TryParse(command[4], out y2))
-                        {
-                            Console.WriteLine(Constants.InvalidArgumentFormat);
+                            if (matrix == null)
+                            {
+                                Console.WriteLine(Constants.CanvasNotPresentMessage);
+                                break;
+                            }
+
+                            if (command.Length != 5)
+                            {
+                                Console.WriteLine(Constants.ImproperRectangleCommandMessage);
+                                break;
+                            }
+
+                            if (!int.TryParse(command[1], out x1) || !int.TryParse(command[2], out y1)
+                                || !int.TryParse(command[3], out x2) || !int.TryParse(command[4], out y2))
+                            {
+                                Console.WriteLine(Constants.InvalidArgumentFormat);
+                                break;
+                            }
+
+                            if ((x1 == x2) || (y1 == y2))
+                            {
+                                Console.WriteLine(Constants.NotARectangleMessage);
+                                break;
+                            }
+
+                            hasError = false;
+
+                            if (x1 < x2)
+                            {
+                                list.Add(new Point { X = x1, Y = y1 });
+                                list.Add(new Point { X = x2, Y = y2 });
+                            }
+                            else
+                            {
+                                list.Add(new Point { X = x2, Y = y2 });
+                                list.Add(new Point { X = x1, Y = y1 });
+                            }
+
                             break;
-                        }
+                        case CommandEnum.B:
+                            if (matrix == null)
+                            {
+                                Console.WriteLine(Constants.CanvasNotPresentMessage);
+                                break;
+                            }
 
-                        if ((x1 != x2) && (y1 != y2))
-                        {
-                            Console.WriteLine(Constants.NotALineMessage);
-                            break;
-                        }
+                            if (command.Length != 4)
+                            {
+                                Console.WriteLine(Constants.ImproperFillCommandMessage);
+                                break;
+                            }
 
-                        hasError = false;
-                        if (x1 < x2)
-                        {
+                            if (!int.TryParse(command[1], out x1) || !int.TryParse(command[2], out y1)
+                                || !char.TryParse(command[3], out c))
+                            {
+                                Console.WriteLine(Constants.InvalidArgumentFormat);
+                                break;
+                            }
+                            if (x1 < 1 || y1 < 1 || matrix[y1][x1] == 'x' || matrix[y1][x1] == '-'
+                                || matrix[y1][x1] == '|')
+                            {
+                                Console.WriteLine(Constants.CellOccupied);
+                                break;
+                            }
+
+                            hasError = false;
                             list.Add(new Point { X = x1, Y = y1 });
-                            list.Add(new Point { X = x2, Y = y2 });
-                        }
-                        else
-                        {
-                            list.Add(new Point { X = x2, Y = y2 });
-                            list.Add(new Point { X = x1, Y = y1 });
-                        }
-
-                        break;
-                    case "R":
-
-                        if (matrix == null)
-                        {
-                            Console.WriteLine(Constants.CanvasNotPresentMessage);
                             break;
-                        }
+                        case CommandEnum.Q:
+                            Console.WriteLine(Constants.ExitQuestion);
+                            var input = Console.ReadLine();
+                            if (input.Equals("y", StringComparison.OrdinalIgnoreCase))
+                            {
+                                Console.WriteLine(Constants.ExitMessage);
+                                Thread.Sleep(500);
+                                Environment.Exit(0);
+                            }
 
-                        if (command.Length != 5)
-                        {
-                            Console.WriteLine(Constants.ImproperRectangleCommandMessage);
                             break;
-                        }
-
-                        if (!int.TryParse(command[1], out x1) || !int.TryParse(command[2], out y1)
-                            || !int.TryParse(command[3], out x2) || !int.TryParse(command[4], out y2))
-                        {
-                            Console.WriteLine(Constants.InvalidArgumentFormat);
+                        default:
+                            Console.WriteLine(Constants.BadCommandMessage);
                             break;
-                        }
-
-                        if ((x1 == x2) || (y1 == y2))
-                        {
-                            Console.WriteLine(Constants.NotARectangleMessage);
-                            break;
-                        }
-
-                        hasError = false;
-                        if (x1 < x2)
-                        {
-                            list.Add(new Point { X = x1, Y = y1 });
-                            list.Add(new Point { X = x2, Y = y2 });
-                        }
-                        else
-                        {
-                            list.Add(new Point { X = x2, Y = y2 });
-                            list.Add(new Point { X = x1, Y = y1 });
-                        }
-
-                        break;
-                    case "B":
-                        if (matrix == null)
-                        {
-                            Console.WriteLine(Constants.CanvasNotPresentMessage);
-                            break;
-                        }
-
-                        if (command.Length != 4)
-                        {
-                            Console.WriteLine(Constants.ImproperFillCommandMessage);
-                            break;
-                        }
-
-                        if (!int.TryParse(command[1], out x1) || !int.TryParse(command[2], out y1)
-                            || !char.TryParse(command[3], out c))
-                        {
-                            Console.WriteLine(Constants.InvalidArgumentFormat);
-                            break;
-                        }
-
-                        hasError = false;
-                        list.Add(new Point { X = x1, Y = y1 });
-                        break;
-                    case "Q":
-                        issueCommand = false;
-                        Console.WriteLine(Constants.ExitMessage);
-                        break;
-                    default:
-                        Console.WriteLine(Constants.BadCommandMessage);
-                        break;
+                    }
                 }
             }
 

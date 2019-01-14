@@ -1,4 +1,6 @@
 ﻿using DrawingProblem.DrawingActions;
+using DrawingProblem.Utilities;
+using System;
 
 namespace DrawingProblem.DrawingFactory
 {
@@ -10,22 +12,29 @@ namespace DrawingProblem.DrawingFactory
         public IDrawing CreateObject(string c)
         {
             IDrawing drawing = null;
-            switch (c)
+
+            if (!Enum.TryParse(c, out CommandEnum command))
             {
-                case "C":
+                return drawing;
+            }
+            else
+            {
+                if (command == CommandEnum.C)
+                {
                     drawing = new CreateCanvas();
-                    break;
-                case "L":
+                }
+                else if (command == CommandEnum.L)
+                {
                     drawing = new CreateNewLine();
-                    break;
-                case "R":
+                }
+                else if (command == CommandEnum.R)
+                {
                     drawing = new CreateRectangle();
-                    break;
-                case "B":
+                }
+                else if (command == CommandEnum.B)
+                {
                     drawing = new FillArea();
-                    break;
-                default:
-                    break;
+                }
             }
 
             return drawing;

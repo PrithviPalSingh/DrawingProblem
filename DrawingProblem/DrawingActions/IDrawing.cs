@@ -8,6 +8,6 @@ namespace DrawingProblem
     /// </summary>
     public interface IDrawing
     {
-        void Draw(char[][] matrix, List<Point> list, char c = ' ');
+        void Draw(char[][] matrix, IList<Point> list, char c = ' ');
     }
 }
