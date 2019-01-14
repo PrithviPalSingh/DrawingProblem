@@ -80,9 +80,9 @@ namespace DrawingProblem
                 }
                 else
                 {
-                    switch (parsedCommand)
+                    switch (command[0].ToUpper())
                     {
-                        case CommandEnum.C:
+                        case "C":
                             if (command.Length != 3)
                             {
                                 Console.WriteLine(Constants.ImproperCreateCommandMessage);
@@ -105,7 +105,7 @@ namespace DrawingProblem
                             list.Add(new Point { X = width, Y = height });
                             matrix = new char[height + 2][];
                             break;
-                        case CommandEnum.L:
+                        case "L":
                             if (matrix == null)
                             {
                                 Console.WriteLine(Constants.CanvasNotPresentMessage);
@@ -157,7 +157,7 @@ namespace DrawingProblem
                             }
 
                             break;
-                        case CommandEnum.R:
+                        case "R":
 
                             if (matrix == null)
                             {
@@ -188,17 +188,33 @@ namespace DrawingProblem
 
                             if (x1 < x2)
                             {
-                                list.Add(new Point { X = x1, Y = y1 });
-                                list.Add(new Point { X = x2, Y = y2 });
+                                if (y1 < y2)
+                                {
+                                    list.Add(new Point { X = x1, Y = y1 });
+                                    list.Add(new Point { X = x2, Y = y2 });
+                                }
+                                else
+                                {
+                                    list.Add(new Point { X = x1, Y = y2 });
+                                    list.Add(new Point { X = x2, Y = y1 });
+                                }
                             }
                             else
                             {
-                                list.Add(new Point { X = x2, Y = y2 });
-                                list.Add(new Point { X = x1, Y = y1 });
+                                if (y1 < y2)
+                                {
+                                    list.Add(new Point { X = x2, Y = y1 });
+                                    list.Add(new Point { X = x1, Y = y2 });
+                                }
+                                else
+                                {
+                                    list.Add(new Point { X = x2, Y = y2 });
+                                    list.Add(new Point { X = x1, Y = y1 });
+                                }
                             }
 
                             break;
-                        case CommandEnum.B:
+                        case "B":
                             if (matrix == null)
                             {
                                 Console.WriteLine(Constants.CanvasNotPresentMessage);
@@ -227,7 +243,7 @@ namespace DrawingProblem
                             hasError = false;
                             list.Add(new Point { X = x1, Y = y1 });
                             break;
-                        case CommandEnum.Q:
+                        case "Q":
                             Console.WriteLine(Constants.ExitQuestion);
                             var input = Console.ReadLine();
                             if (input.Equals("y", StringComparison.OrdinalIgnoreCase))
