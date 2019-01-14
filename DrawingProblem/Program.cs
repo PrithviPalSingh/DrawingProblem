@@ -233,8 +233,9 @@ namespace DrawingProblem
                                 Console.WriteLine(Constants.InvalidArgumentFormat);
                                 break;
                             }
-                            if (x1 < 1 || y1 < 1 || matrix[y1][x1] == 'x' || matrix[y1][x1] == '-'
-                                || matrix[y1][x1] == '|')
+
+                            if (x1 >= 0 && y1 >= 0 && x1 < (width + 2) && y1 < (height + 2)
+                                && matrix[y1][x1] != '\0')
                             {
                                 Console.WriteLine(Constants.CellOccupied);
                                 break;
