@@ -30,7 +30,7 @@ namespace DrawingProblem
                         IDrawing drawing = null;
                         drawing = df.CreateObject(command[0].ToUpper());
                         drawing.Draw(matrix, list, c);
-                        Utilities.Utilities.DrawCanvas(matrix);
+                        Utilities.Utilities.Paint(matrix);
                     }
 
                     Console.WriteLine();
@@ -39,8 +39,7 @@ namespace DrawingProblem
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
-                Console.WriteLine(ex.StackTrace);
+                Console.WriteLine(Constants.ExceptionMessageToUser);
                 File.AppendAllText("ErrorMessages.txt", Environment.NewLine + DateTime.Now +
                     Environment.NewLine + ex.Message + Environment.NewLine
                     + ex.StackTrace + Environment.NewLine);

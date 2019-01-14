@@ -25,5 +25,6 @@ namespace DrawingProblem.Utilities
         public const string ExitQuestion = "Do you want to quit application? Press \"y\" to exit";
         public const string ExitMessage = "Exiting!!";
         public const string CellOccupied = "Cell is occupied and Fill operation cannot be performed.";
+        public const string ExceptionMessageToUser = "Something went wrong!! Please contact administrator";
     }
 }

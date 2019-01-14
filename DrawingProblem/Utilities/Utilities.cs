@@ -12,7 +12,7 @@ namespace DrawingProblem.Utilities
         /// <summary>
         /// Draw the canvas using matrix send to this method
         /// </summary>
-        public static void DrawCanvas(char[][] matrix)
+        public static void Paint(char[][] matrix)
         {          
             for (int i = 0; i < matrix.Length; i++)
             {
